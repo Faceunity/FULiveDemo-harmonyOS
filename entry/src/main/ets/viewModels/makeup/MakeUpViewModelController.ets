@@ -538,8 +538,8 @@ class MakeUpViewModelController {
         break
       case SubMakeupType.EyeShadow:
         makeUp.setEyeColors(
-          new FUNMColor(0, 0, 0, 0),
           new FUNMColor(color[0], color[1], color[2], color[3]),
+          new FUNMColor(0, 0, 0, 0),
           new FUNMColor(color[4], color[5], color[6], color[7]),
           new FUNMColor(color[8], color[9], color[10], color[11]),
         )

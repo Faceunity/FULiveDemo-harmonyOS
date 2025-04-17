@@ -1,7 +1,7 @@
 import {
   FULogger,
   FUNMAIKit,
-  FUNMCameraInput,
+  FUNMSurfaceInput,
   FUNMDisplayView,
   FUNMFaceProcessorDetectMode,
   FUNMFileUtil,
@@ -252,6 +252,7 @@ export struct VideoRenderPage {
         this.inputFile = undefined;
       }
 
+      FUNMAIKit.shareKit().faceProcessorDetectMode = FUNMFaceProcessorDetectMode.Video;
       FUNMRenderKit.clearRenderTasks();
       FUNMRenderKit.releaseGLResource();
     })
@@ -377,7 +378,7 @@ export struct VideoRenderPage {
       configT.xcomponentId = VideoRenderXcomponentIdG;
       configT.outputType = FUNMOutputType.XCOMPONENT;
 
-      const cInput = new FUNMCameraInput();
+      const cInput = new FUNMSurfaceInput();
       cInput.nativeImage = this.nativeImage;
 
       const input = new FUNMRenderInput(configT);
