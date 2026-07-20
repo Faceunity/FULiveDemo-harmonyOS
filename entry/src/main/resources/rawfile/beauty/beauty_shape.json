@@ -81,6 +81,15 @@
     "performanceLevel": 1
   },
   {
+    "name": "瞳孔大小",
+    "imeName": "tongkongdaxiao",
+    "type": 25,
+    "currentValue": 0.5,
+    "defaultValue": 0.5,
+    "defaultValueInMiddle": true,
+    "performanceLevel": -1
+  },
+  {
     "name": "下巴",
     "imeName": "xiaba",
     "type": 9,

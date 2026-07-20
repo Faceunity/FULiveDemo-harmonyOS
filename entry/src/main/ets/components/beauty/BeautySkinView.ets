@@ -1,8 +1,14 @@
 import { FUNMNumberUtil } from '@faceunity/renderkit_nama';
-import { SELECTCOLOR } from '../../constants/Constants';
+import { promptAction } from '@kit.ArkUI';
+import { FUBeautySkin, SELECTCOLOR } from '../../constants/Constants';
 import { BeautySkinModel } from '../../models/beauty/BeautySkinModel';
 import { BeautyDataService } from '../../service/BeautyDataService';
 import { CustomDialogCancelOrConfirm } from '../common/CustomDialog';
+
+/** 鸿蒙端性能暂不推荐的美肤项：置灰，点击仅提示 */
+function isSkinFeatureDisabled(type: FUBeautySkin): boolean {
+  return type === FUBeautySkin.AntiAcneSpot || type === FUBeautySkin.FacialPlump;
+}
 
 @Component
 export struct BeautySkinView {
@@ -24,37 +30,78 @@ export struct BeautySkinView {
     this.dataArray[this.gridCurrentIndex].currentValue / this.dataArray[this.gridCurrentIndex].ratio * 100.0;
   @State sliderString: string = this.sliderValue.toString();
   @State needToReset: boolean = true;
+  @State showSkinSegmentation: boolean = this.dataArray[this.gridCurrentIndex].type === FUBeautySkin.ColorLevel;
+  @State skinSegmentationIndex: number = this.viewModel.skinSegmentationEnabled ? 1 : 0;
 
   build() {
     Column() {
-
-      Slider({
-        value: this.sliderValue,
-        min: 0,
-        max: 100,
-        step: 1,
-        style: SliderStyle.OutSet,
-        direction: Axis.Horizontal,
-        reverse: false
-      })
-        .width(260)
-        .height(40)
-        .trackThickness(1)
-        .blockSize({ width: 13, height: 13 })
-        .blockStyle({ type: SliderBlockType.SHAPE, shape: new Rect({ width: 13, height: 13 }) })
-        .blockColor(SELECTCOLOR)// 设置滑块颜色
-        .trackColor(Color.White)// 设置滑轨颜色
-        .selectedColor(SELECTCOLOR)// 设置滑轨的已滑动颜色
-        .showTips(true, this.sliderString)
-        .onChange((value: number, mode: SliderChangeMode) => {
-          if (!this.needToReset) {
-            this.needToReset = true;
+      Row() {
+        if (this.showSkinSegmentation) {
+          Row() {
+            Text('全局')
+              .fontSize(10)
+              .fontColor(this.skinSegmentationIndex === 0 ? '#2C2E30' : '#73FFFFFF')
+              .textAlign(TextAlign.Center)
+              .width('50%')
+              .height('100%')
+              .backgroundColor(this.skinSegmentationIndex === 0 ? Color.White : Color.Transparent)
+              .borderRadius(12)
+              .onClick(() => {
+                this.skinSegmentationIndex = 0;
+                this.viewModel.setSkinSegmentationEnabled(false);
+              })
+            Text('仅皮肤')
+              .fontSize(10)
+              .fontColor(this.skinSegmentationIndex === 1 ? '#2C2E30' : '#73FFFFFF')
+              .textAlign(TextAlign.Center)
+              .width('50%')
+              .height('100%')
+              .backgroundColor(this.skinSegmentationIndex === 1 ? Color.White : Color.Transparent)
+              .borderRadius(12)
+              .onClick(() => {
+                this.skinSegmentationIndex = 1;
+                this.viewModel.setSkinSegmentationEnabled(true);
+              })
           }
-          this.sliderValue = value;
-          this.sliderString = FUNMNumberUtil.formatNumber(value, 0, true);
-          const model = this.dataArray[this.gridCurrentIndex];
-          this.viewModel.setSkinValue(model, value / 100.0);
+          .width(80)
+          .height(24)
+          .border({ width: 1, color: Color.White })
+          .borderRadius(12)
+          .clip(true)
+          .margin({ left: 16, right: 8 })
+        }
+
+        Slider({
+          value: this.sliderValue,
+          min: 0,
+          max: 100,
+          step: 1,
+          style: SliderStyle.OutSet,
+          direction: Axis.Horizontal,
+          reverse: false
         })
+          .width(this.showSkinSegmentation ? 200 : 260)
+          .height(40)
+          .trackThickness(1)
+          .blockSize({ width: 13, height: 13 })
+          .blockStyle({ type: SliderBlockType.SHAPE, shape: new Rect({ width: 13, height: 13 }) })
+          .blockColor(SELECTCOLOR)// 设置滑块颜色
+          .trackColor(Color.White)// 设置滑轨颜色
+          .selectedColor(SELECTCOLOR)// 设置滑轨的已滑动颜色
+          .showTips(true, this.sliderString)
+          .onChange((value: number, mode: SliderChangeMode) => {
+            if (!this.needToReset) {
+              this.needToReset = true;
+            }
+            this.sliderValue = value;
+            this.sliderString = FUNMNumberUtil.formatNumber(value, 0, true);
+            const model = this.dataArray[this.gridCurrentIndex];
+            this.viewModel.setSkinValue(model, value / 100.0);
+          })
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Center)
 
       Row() {
         Image($r('app.media.recover_item'))
@@ -78,6 +125,7 @@ export struct BeautySkinView {
               gridCurrentIndex: this.gridCurrentIndex,
               sliderValue: this.sliderValue,
               sliderString: this.sliderString,
+              showSkinSegmentation: this.showSkinSegmentation,
               index: index,
               model: model,
               needToReset: this.needToReset
@@ -101,6 +149,7 @@ export struct BeautySkinView {
 
   private onAccept() {
     this.viewModel.recoverAllSkinValuesToDefault();
+    this.skinSegmentationIndex = 0;
     const model = this.dataArray[this.gridCurrentIndex];
     this.sliderValue = model.defaultValue / model.ratio * 100.0;
     if (this.needToReset) {
@@ -114,6 +163,7 @@ struct GridItemBuilder {
   @Link gridCurrentIndex: number
   @Link sliderValue: number
   @Link sliderString: string
+  @Link showSkinSegmentation: boolean
   @Link needToReset: boolean;
   index: number = 0;
   model: BeautySkinModel | undefined = undefined;
@@ -124,8 +174,10 @@ struct GridItemBuilder {
         Image(this.getImageName())
           .width(50)
           .height(50)
+          .opacity(this.isDisabled() ? 0.7 : 1)
         Text(this.model?.name)
           .fontColor(this.getTextColor())
+          .opacity(this.isDisabled() ? 0.7 : 1)
           .textAlign(TextAlign.Center)
           .fontSize(14)
           .margin({ top: 3 })
@@ -133,12 +185,20 @@ struct GridItemBuilder {
     }
     .width(67)
     .height(80)
-    .selected(this.gridCurrentIndex === this.index)
+    .selected(!this.isDisabled() && this.gridCurrentIndex === this.index)
     .onClick(() => {
+      if (this.isDisabled()) {
+        promptAction.showToast({
+          message: `${this.model?.name ?? ''}功能当前设备性能暂不支持`,
+          duration: 1500
+        });
+        return;
+      }
       this.gridCurrentIndex = this.index;
       if (this.model) {
         this.sliderValue = this.model.currentValue / this.model.ratio * 100.0;
         this.sliderString = FUNMNumberUtil.formatNumber(this.sliderValue, 0, true);
+        this.showSkinSegmentation = this.model.type === FUBeautySkin.ColorLevel;
       }
       if (!this.needToReset) {
         this.needToReset = true;
@@ -146,7 +206,16 @@ struct GridItemBuilder {
     })
   }
 
+  private isDisabled(): boolean {
+    return this.model !== undefined && isSkinFeatureDisabled(this.model.type);
+  }
+
   private getImageName(): Resource {
+    // 置灰项固定未启用态图标
+    if (this.isDisabled()) {
+      return $r(`app.media.${this.model?.imeName}_0`);
+    }
+
     let imaName = '';
     if (this.gridCurrentIndex === this.index) {
       imaName =
@@ -156,14 +225,13 @@ struct GridItemBuilder {
         this.model?.currentValue !== 0 ? `${this.model?.imeName}_1` : `${this.model?.imeName}_0`;
     }
 
-    if (!this.needToReset) {
-      return $r(`app.media.${imaName}`);
-    }
-
     return $r(`app.media.${imaName}`);
   }
 
   private getTextColor(): ResourceColor {
+    if (this.isDisabled()) {
+      return Color.White;
+    }
     return this.gridCurrentIndex === this.index ? SELECTCOLOR : Color.White;
   }
 }

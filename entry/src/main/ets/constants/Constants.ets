@@ -31,7 +31,9 @@ export enum FUBeautySkin {
   RemovePouchStrength,
   RemoveNasolabialFoldsStrength,
   AntiAcneSpot,
-  Clarity
+  Clarity,
+  BodyBlurLevel, // 全身磨皮，SDK key: body_blur_level，范围 0.0-6.0
+  FacialPlump // 面部丰盈，SDK key: facial_plump，范围 0.0-1.0
 }
 
 export enum FUBeautyShape {
@@ -59,7 +61,8 @@ export enum FUBeautyShape {
   Smile,
   BrowHeight,
   BrowSpace,
-  BrowThick
+  BrowThick,
+  EyePupil // 瞳孔大小，SDK key: intensity_eye_pupil，范围 0.0-1.0，双向滑杆
 }
 
 export type modelValueType = string | number | boolean;

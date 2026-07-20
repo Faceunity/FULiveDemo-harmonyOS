@@ -10,6 +10,36 @@
     "performanceLevel": -1
   },
   {
+    "name": "全身磨皮",
+    "imeName": "quanshenmopi",
+    "type": 11,
+    "currentValue": 0.0,
+    "defaultValue": 0.0,
+    "defaultValueInMiddle": false,
+    "ratio": 6,
+    "performanceLevel": 4
+  },
+  {
+    "name": "祛斑痘",
+    "imeName": "qubandou",
+    "type": 9,
+    "currentValue": 0.0,
+    "defaultValue": 0.0,
+    "defaultValueInMiddle": false,
+    "ratio": 1,
+    "performanceLevel": 3
+  },
+  {
+    "name": "面部丰盈",
+    "imeName": "mianbufengying",
+    "type": 12,
+    "currentValue": 0.0,
+    "defaultValue": 0.0,
+    "defaultValueInMiddle": false,
+    "ratio": 1,
+    "performanceLevel": 3
+  },
+  {
     "name": "美白",
     "imeName": "meibai",
     "type": 1,

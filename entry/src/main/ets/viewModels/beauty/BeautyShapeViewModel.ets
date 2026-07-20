@@ -4,7 +4,7 @@ import { BeautyShapeModel } from '../../models/beauty/BeautyShapeModel'
 
 const TAG: string = '[BeautyShapeViewModel]';
 const shapeJsonName = 'beauty/beauty_shape.json';
-const sandboxJsonName = 'beauty/v8.13.0/beauty_shape.json';
+const sandboxJsonName = 'beauty/v9.0.0/beauty_shape.json';
 
 export class BeautyShapeViewModel {
   dataArray: BeautyShapeModel[] = [];
@@ -91,6 +91,10 @@ export class BeautyShapeViewModel {
         break;
       case FUBeautyShape.EyeCircle:
         beauty.intensityEyeCircle = value;
+        break;
+      case FUBeautyShape.EyePupil:
+        // intensity_eye_pupil: 0.0-1.0，0.5 为默认
+        beauty.setParamForName('intensity_eye_pupil', value);
         break;
       case FUBeautyShape.Chin:
         beauty.intensityChin = value;

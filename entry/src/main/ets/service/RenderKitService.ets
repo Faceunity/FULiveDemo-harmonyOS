@@ -127,8 +127,9 @@ export class RenderKitService implements FUNMAutoRenderDelegate, FUNMFPSDelegate
   // 初始化AIKit
   initAIKit() {
     // faceAI 配置
-    const faceAiConfig: FUAIFACEALGORITHMCONFIG =
-      FUAIFACEALGORITHMCONFIG.FUAIFACE_DISABLE_DEL_SPOT | FUAIFACEALGORITHMCONFIG.FUAIFACE_DISABLE_ARMESHV2
+    // 对齐 iOS 高端机：开启祛斑痘（不要 DISABLE_DEL_SPOT），否则 antiAcneSpot 无效果
+    // iOS: level >= VeryHigh(iPhoneXR) 才启用 DelSpot；鸿蒙 SDK 暂无 devicePerformanceLevel 接口，先默认开启
+    const faceAiConfig: FUAIFACEALGORITHMCONFIG = FUAIFACEALGORITHMCONFIG.FUAIFACE_DISABLE_ARMESHV2
     FUNMAIKit.shareKit().setFaceAlgorithmConfig(faceAiConfig)
     FUNMAIKit.loadAIModeWithAIType(FUAITYPE.FUAITYPE_FACEPROCESSOR, { rawfilePath: 'ai_face_processor.bundle' });
     FUNMAIKit.shareKit().maxTrackFaces = 2;
