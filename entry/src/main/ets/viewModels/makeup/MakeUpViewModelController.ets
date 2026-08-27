@@ -7,6 +7,7 @@ import {
   FUNMRenderKit,
   FUNMColor
 } from '@faceunity/renderkit_nama';
+import namaApi from 'libfunama_napi.so';
 import { HorizontalScrollLabelViewInterface } from '../../components/makeup/HorizontalScrollLabelView';
 
 class MakeUpViewModelController {
@@ -16,6 +17,8 @@ class MakeUpViewModelController {
   // 保存进入页面时候的美妆初始值
   cache_beauty_filterName: string = ''
   cache_beauty_filterLevel: number = 0
+  /// 当前绑定的卧蚕子妆（FUNMMakeup 与 iOS FUMakeup 一样没有 subWocan，需自行 bind/unbind）
+  private currentWocanItem: FUNMItem | undefined = undefined
 
   constructor() {
     this.subMakeupViewModel = new SubMakeupViewModel();
@@ -30,6 +33,7 @@ class MakeUpViewModelController {
   }
 
   static destroy() {
+    MakeUpViewModelController.instance?.clearWocanItem()
     MakeUpViewModelController.instance = undefined;
   }
 
@@ -119,6 +123,11 @@ class MakeUpViewModelController {
             selectMakeup.select_eyelashModel = {} as SubMakeupItemModel
           }
           selectMakeup.select_eyelashModel.value = newValue
+        } else if (labelName === '卧蚕') {
+          if (!selectMakeup.select_wocanModel) {
+            selectMakeup.select_wocanModel = {} as SubMakeupItemModel
+          }
+          selectMakeup.select_wocanModel.value = newValue
         } else if (labelName === '高光') {
           if (!selectMakeup.select_highlightModel) {
             selectMakeup.select_highlightModel = {} as SubMakeupItemModel
@@ -185,6 +194,8 @@ class MakeUpViewModelController {
 
   // 主 bundle 变更
   onMakeupSelectDidChange() {
+    // 先释放卧蚕（FUNMMakeup 不知道该子妆）
+    this.clearWocanItem()
     // 先释放
     if(FUNMRenderKit.sharedInstance().makeup) {
       FUNMRenderKit.sharedInstance().makeup?.destroy()
@@ -328,6 +339,8 @@ class MakeUpViewModelController {
       selectMakeup.select_eyelinerModel = subMakeup
     } else if (labelName === '睫毛') {
       selectMakeup.select_eyelashModel = subMakeup
+    } else if (labelName === '卧蚕') {
+      selectMakeup.select_wocanModel = subMakeup
     } else if (labelName === '高光') {
       selectMakeup.select_highlightModel = subMakeup
     } else if (labelName === '阴影') {
@@ -375,6 +388,11 @@ class MakeUpViewModelController {
       if (!SubMakeupViewModel.isResetSubMakeupItem(makeupModel.select_eyelashModel)) {
         makeupModel.select_eyelashModel.value = Number((makeupModel.eyelashModel.value * makeupModel.value).toFixed(2));
       }
+      if (makeupModel.select_wocanModel &&
+        !SubMakeupViewModel.isResetSubMakeupItem(makeupModel.select_wocanModel)) {
+        makeupModel.select_wocanModel.value =
+          Number(((makeupModel.wocanModel?.value ?? 0) * makeupModel.value).toFixed(2));
+      }
       if (!SubMakeupViewModel.isResetSubMakeupItem(makeupModel.select_highlightModel)) {
         makeupModel.select_highlightModel.value =
           Number((makeupModel.highlightModel.value * makeupModel.value).toFixed(2));
@@ -396,6 +414,11 @@ class MakeUpViewModelController {
         Number((makeupModel.eyeShadowModel.value * makeupModel.value).toFixed(2));
       makeupModel.select_eyelinerModel.value = Number((makeupModel.eyelinerModel.value * makeupModel.value).toFixed(2));
       makeupModel.select_eyelashModel.value = Number((makeupModel.eyelashModel.value * makeupModel.value).toFixed(2));
+      if (!makeupModel.select_wocanModel) {
+        makeupModel.select_wocanModel = {} as SubMakeupItemModel
+      }
+      makeupModel.select_wocanModel.value =
+        Number(((makeupModel.wocanModel?.value ?? 0) * makeupModel.value).toFixed(2));
       makeupModel.select_highlightModel.value =
         Number((makeupModel.highlightModel.value * makeupModel.value).toFixed(2));
       makeupModel.select_shadowModel.value = Number((makeupModel.shadowModel.value * makeupModel.value).toFixed(2));
@@ -434,6 +457,7 @@ class MakeUpViewModelController {
     makeup.intensityEyeshadow = makeupModel.select_eyeShadowModel.value
     makeup.intensityEyeliner = makeupModel.select_eyelinerModel.value
     makeup.intensityEyelash = makeupModel.select_eyelashModel.value
+    makeup.setParamForName('makeup_intensity_wocan', makeupModel.select_wocanModel?.value ?? 0)
     makeup.intensityHighlight = makeupModel.select_highlightModel.value
     makeup.intensityShadow = makeupModel.select_shadowModel.value
     makeup.intensityPupil = makeupModel.select_pupilModel.value
@@ -466,13 +490,17 @@ class MakeUpViewModelController {
   // 子 bundle 切换
   private _updateSubMakeupBundle() {
     const selectSubMakeupItem = this.subMakeupViewModel.selectLabel_model.u_sgArr_select_model
+    const makeUp: FUNMMakeup = FUNMRenderKit.sharedInstance().makeup as FUNMMakeup
     if (!selectSubMakeupItem.bundleName) {
-      // 如果选择了卸妆，没有 bundle 信息
+      // 子妆卸妆：解绑当前类型
+      if (selectSubMakeupItem.type === SubMakeupType.Wocan) {
+        this.bindWocanItem(undefined)
+        makeUp.setParamForName('makeup_intensity_wocan', 0)
+      }
       return
     }
     const subBundlePath = SubMakeupViewModel.getSubMakeupBundlePathWithModel(selectSubMakeupItem)
     const subMakeupBundle = new FUNMItem({ rawfilePath: subBundlePath });
-    const makeUp: FUNMMakeup = FUNMRenderKit.sharedInstance().makeup as FUNMMakeup
     switch (selectSubMakeupItem.type) {
       case SubMakeupType.Foundation:
         makeUp.subFoundation = subMakeupBundle
@@ -494,6 +522,9 @@ class MakeUpViewModelController {
         break
       case SubMakeupType.Eyelash:
         makeUp.subEyelash = subMakeupBundle
+        break
+      case SubMakeupType.Wocan:
+        this.bindWocanItem(subMakeupBundle)
         break
       case SubMakeupType.Highlight:
         makeUp.subHighlight = subMakeupBundle
@@ -597,6 +628,9 @@ class MakeUpViewModelController {
       case SubMakeupType.Eyelash:
         makeUp.intensityEyelash = selectSubMakeupItem.value
         break
+      case SubMakeupType.Wocan:
+        makeUp.setParamForName('makeup_intensity_wocan', selectSubMakeupItem.value)
+        break
       case SubMakeupType.Highlight:
         makeUp.intensityHighlight = selectSubMakeupItem.value
         break
@@ -606,6 +640,51 @@ class MakeUpViewModelController {
       case SubMakeupType.Pupil:
         makeUp.intensityPupil = selectSubMakeupItem.value
         break
+    }
+  }
+
+  /**
+   * 绑定/解绑卧蚕子妆到 face_makeup
+   * @note FUNMMakeup 与 iOS FUMakeup 一样没有 subWocan，对齐 LiveDemo：
+   * fuBindItems / fuUnbindItems + makeup_intensity_wocan
+   */
+  clearWocanItem() {
+    this.bindWocanItem(undefined)
+  }
+
+  private bindWocanItem(item: FUNMItem | undefined) {
+    const makeup = FUNMRenderKit.sharedInstance().makeup
+    const oldItem = this.currentWocanItem
+    if (oldItem === item) {
+      if ((oldItem && oldItem.binded) || !item) {
+        return
+      }
+    }
+    if (makeup && makeup.loaded) {
+      this.unbindItemFromMakeup(makeup, oldItem)
+      this.bindItemToMakeup(makeup, item)
+    }
+    if (oldItem && oldItem !== item) {
+      oldItem.destroy()
+    }
+    this.currentWocanItem = item
+  }
+
+  private bindItemToMakeup(makeup: FUNMMakeup, item: FUNMItem | undefined) {
+    if (item && !item.binded && item.itemId > 0) {
+      const itemIds = new Int32Array(1)
+      itemIds[0] = item.itemId
+      namaApi.fuBindItems(makeup.itemId, itemIds)
+      item.binded = true
+    }
+  }
+
+  private unbindItemFromMakeup(makeup: FUNMMakeup, item: FUNMItem | undefined) {
+    if (item && item.binded && item.itemId > 0) {
+      const itemIds = new Int32Array(1)
+      itemIds[0] = item.itemId
+      namaApi.fuUnbindItems(makeup.itemId, itemIds)
+      item.binded = false
     }
   }
 }

@@ -10,6 +10,7 @@ export enum SubMakeupType {
   EyeShadow, // 眼影
   Eyeliner, // 眼线
   Eyelash, // 睫毛
+  Wocan, // 卧蚕
   Highlight, // 高光
   Shadow, // 阴影
   Pupil // 美瞳
@@ -117,6 +118,8 @@ export class SubMakeupViewModel {
       case SubMakeupType.Eyelash:
         // $rawfile('makeup/CustomizedMakeup/Eyelash/mu_style_eyelash_06.bundle')
         return `makeup/CustomizedMakeup/Eyelash/${subModel.bundleName}.bundle`
+      case SubMakeupType.Wocan:
+        return `makeup/CustomizedMakeup/Wocan/${subModel.bundleName}.bundle`
       case SubMakeupType.Highlight:
         // $rawfile('makeup/CustomizedMakeup/Highlight/mu_style_highlight_02.bundle')
         return `makeup/CustomizedMakeup/Highlight/${subModel.bundleName}.bundle`

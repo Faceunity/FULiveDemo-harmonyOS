@@ -4,7 +4,7 @@ import { BeautyShapeModel } from '../../models/beauty/BeautyShapeModel'
 
 const TAG: string = '[BeautyShapeViewModel]';
 const shapeJsonName = 'beauty/beauty_shape.json';
-const sandboxJsonName = 'beauty/v9.0.0/beauty_shape.json';
+const sandboxJsonName = 'beauty/v9.1.0/beauty_shape.json';
 
 export class BeautyShapeViewModel {
   dataArray: BeautyShapeModel[] = [];
@@ -143,6 +143,21 @@ export class BeautyShapeViewModel {
         break;
       case FUBeautyShape.BrowThick:
         beauty.intensityBrowThick = value;
+        break;
+      case FUBeautyShape.CustomWarpFaceLift:
+        beauty.setParamForName('custom_warp_face_lift', value);
+        break;
+      case FUBeautyShape.CustomWarpSmallHead:
+        beauty.setParamForName('custom_warp_small_head', value);
+        break;
+      case FUBeautyShape.CustomWarpEyeOutter:
+        beauty.setParamForName('custom_warp_eye_outter', value);
+        break;
+      case FUBeautyShape.CustomWarpMouthWidth:
+        beauty.setParamForName('custom_warp_mouth_width', value);
+        break;
+      case FUBeautyShape.CustomWarpNoseAlar:
+        beauty.setParamForName('custom_warp_nose_alar', value);
         break;
     }
   }

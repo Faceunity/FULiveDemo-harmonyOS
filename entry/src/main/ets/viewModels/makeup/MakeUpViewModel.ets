@@ -23,6 +23,7 @@ export interface MakeUpModel {
   eyeShadowModel: MakeUpTemplateValueInterface // 眼影
   eyelinerModel: MakeUpTemplateValueInterface // 眼线
   eyelashModel: MakeUpTemplateValueInterface // 睫毛
+  wocanModel: MakeUpTemplateValueInterface // 卧蚕
   highlightModel: MakeUpTemplateValueInterface // 高光
   shadowModel: MakeUpTemplateValueInterface // 阴影
   pupilModel: MakeUpTemplateValueInterface // 美瞳
@@ -40,6 +41,7 @@ export interface MakeUpModel {
   select_eyeShadowModel: SubMakeupItemModel // 眼影
   select_eyelinerModel: SubMakeupItemModel // 眼线
   select_eyelashModel: SubMakeupItemModel // 睫毛
+  select_wocanModel: SubMakeupItemModel // 卧蚕
   select_highlightModel: SubMakeupItemModel // 高光
   select_shadowModel: SubMakeupItemModel // 阴影
   select_pupilModel: SubMakeupItemModel // 美瞳
@@ -139,6 +141,13 @@ export class MakeUpViewModel {
             subMakeUpLabel_name: '睫毛'
           } as MakeUpTemplateValueInterface;
           model.eyelashModel = eyelashModel;
+
+          // 卧蚕
+          const wocanModel: MakeUpTemplateValueInterface = {
+            value: Number((jsonData.makeup_intensity_wocan ?? 0).toFixed(2)),
+            subMakeUpLabel_name: '卧蚕'
+          } as MakeUpTemplateValueInterface;
+          model.wocanModel = wocanModel;
 
           // 高光
           const highlightModel: MakeUpTemplateValueInterface = {
@@ -295,6 +304,8 @@ export class MakeUpViewModel {
       return selectMakeupModel.eyelinerModel
     } else if (labelName === '睫毛') {
       return selectMakeupModel.eyelashModel
+    } else if (labelName === '卧蚕') {
+      return selectMakeupModel.wocanModel
     } else if (labelName === '高光') {
       return selectMakeupModel.highlightModel
     } else if (labelName === '阴影') {

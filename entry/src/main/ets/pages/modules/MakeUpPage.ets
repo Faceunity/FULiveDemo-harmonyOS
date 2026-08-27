@@ -158,6 +158,7 @@ export struct MakeUpPage {
     })
     .onWillDisappear(async () => {
       //销毁, 需要判断是否有效，因为卸妆会将 makeup 赋值 undifine
+      this.viewModelController.clearWocanItem()
       if(FUNMRenderKit.sharedInstance().makeup) {
         (FUNMRenderKit.sharedInstance().makeup as FUNMMakeup).destroy()
         FUNMRenderKit.sharedInstance().makeup = undefined

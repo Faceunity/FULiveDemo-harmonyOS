@@ -48,5 +48,6 @@ export interface SubMakeupJsonModel {
   makeup_highlight_color: number[];
   tex_highlight: string;
   makeup_intensity_highlight: number;
+  makeup_intensity_wocan?: number;
   use_eye_v2: number;
 }

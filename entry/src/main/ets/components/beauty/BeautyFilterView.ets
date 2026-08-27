@@ -91,7 +91,7 @@ struct GridItemBuilder {
           .height(50)
           .borderWidth(2)
           .borderColor(this.getBorderColor())
-        Text(this.model?.filterName)
+        Text(this.model?.displayName)
           .fontColor(this.getTextColor())
           .textAlign(TextAlign.Center)
           .fontSize(14)

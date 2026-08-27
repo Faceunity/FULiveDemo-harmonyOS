@@ -3,8 +3,8 @@ import { FUBeautySkin, modelValueType } from '../../constants/Constants';
 import { BeautySkinModel } from '../../models/beauty/BeautySkinModel'
 
 const skinJsonName = 'beauty/beauty_skin.json';
-const sandboxJsonName = 'beauty/v9.0.0/beauty_skin.json';
-const sandboxSegmentationName = 'beauty/v9.0.0/beauty_skin_segmentation.txt';
+const sandboxJsonName = 'beauty/v9.1.0/beauty_skin.json';
+const sandboxSegmentationName = 'beauty/v9.1.0/beauty_skin_segmentation.txt';
 
 export class BeautySkinViewModel {
   dataArray: BeautySkinModel[] = [];

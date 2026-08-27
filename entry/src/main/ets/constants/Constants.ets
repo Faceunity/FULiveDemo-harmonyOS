@@ -62,7 +62,12 @@ export enum FUBeautyShape {
   BrowHeight,
   BrowSpace,
   BrowThick,
-  EyePupil // 瞳孔大小，SDK key: intensity_eye_pupil，范围 0.0-1.0，双向滑杆
+  EyePupil, // 瞳孔大小，SDK key: intensity_eye_pupil，范围 0.0-1.0，双向滑杆
+  CustomWarpFaceLift, // 面部提拉，custom_warp_face_lift
+  CustomWarpSmallHead, // 小头，custom_warp_small_head
+  CustomWarpEyeOutter, // 外眼角，custom_warp_eye_outter
+  CustomWarpMouthWidth, // 嘴巴宽度，custom_warp_mouth_width
+  CustomWarpNoseAlar // 鼻翼，custom_warp_nose_alar
 }
 
 export type modelValueType = string | number | boolean;

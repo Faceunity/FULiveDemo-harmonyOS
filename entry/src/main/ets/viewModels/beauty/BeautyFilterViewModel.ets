@@ -1,10 +1,10 @@
 import { FULogger, FUNMFileUtil, FUNMRenderKit } from '@faceunity/renderkit_nama'
-import { BeautyFilterModel } from '../../models/beauty/BeautyFilterModel'
+import { BeautyFilterModel, sdkFilterName } from '../../models/beauty/BeautyFilterModel'
 import { modelValueType } from '../../constants/Constants';
 
 const TAG: string = '[BeautyFilterViewModel]';
 const filterJsonName = 'beauty/beauty_filter.json';
-const sandboxJsonName = 'beauty/v8.13.0/beauty_filter.json';
+const sandboxJsonName = 'beauty/v9.1.0/beauty_filter.json';
 const filterSelectedIndexJsonName = 'beauty/beauty_filter_selectedIndex.json';
 
 export class BeautyFilterViewModel {
@@ -26,19 +26,20 @@ export class BeautyFilterViewModel {
         const model = new BeautyFilterModel(map);
         this.dataArray.push(model);
       }
-      this.currentModel = this.dataArray[0];
+      this.currentModel = this.dataArray[1] ?? this.dataArray[0];
     }
 
     // 选中下标
     let selectedIndexStr: string | null = null;
-    const filterSelectedIndexPath = `${FUNMFileUtil.fileDir}/beauty/beauty_filter_selectedIndex.json`;
-    if (FUNMFileUtil.isExist(sbPath)) {
+    const filterSelectedIndexPath = `${FUNMFileUtil.fileDir}/${filterSelectedIndexJsonName}`;
+    if (FUNMFileUtil.isExist(filterSelectedIndexPath)) {
       selectedIndexStr = FUNMFileUtil.readTextFormSandBox(filterSelectedIndexPath);
     }
     this.selectedIndex = Number(selectedIndexStr);
-    if (this.selectedIndex < 0 || this.selectedIndex >= this.dataArray.length)   {
-      this.selectedIndex = 0;
-      this.currentModel = this.dataArray[0];
+    if (isNaN(this.selectedIndex) || this.selectedIndex < 0 || this.selectedIndex >= this.dataArray.length) {
+      // LiveDemo 默认选中柔光冷紫（原图后第一项）
+      this.selectedIndex = this.dataArray.length > 1 ? 1 : 0;
+      this.currentModel = this.dataArray[this.selectedIndex];
       return;
     }
     this.currentModel = this.dataArray[this.selectedIndex];
@@ -82,7 +83,7 @@ export class BeautyFilterViewModel {
       return;
     }
 
-    beauty.filterName = filterName;
+    beauty.filterName = sdkFilterName(filterName);
     beauty.filterLevel = level;
   }
 }

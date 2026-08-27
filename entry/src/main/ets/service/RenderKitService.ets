@@ -107,12 +107,13 @@ export class RenderKitService implements FUNMAutoRenderDelegate, FUNMFPSDelegate
     AppStorage.set('renderTime', FUNMNumberUtil.formatNumber(renderTime, 0, true));
   }
 
+
   // 初始化 RenderKit
   initRenderKit() {
     let byte = new Uint8Array(g_auth_package)
     const config = new FUNMSetupConfig(byte.buffer as ArrayBuffer, byte.length);
     FUNMRenderKit.setup(config);
-    FUNMRenderKit.setLogLevel(FULOGLEVEL.FU_LOG_LEVEL_INFO);
+    FUNMRenderKit.setLogLevel(FULOGLEVEL.FU_LOG_LEVEL_DEBUG);
     FUNMRenderKit.sharedInstance().autoRenderConfig.outputType = FUNMOutputType.XCOMPONENT;
     FUNMRenderKit.sharedInstance().autoRenderConfig.isFrontCamera = true;
     FUNMRenderKit.sharedInstance().autoRenderConfig.camaraResolution = AutoRenderResolution;
@@ -165,10 +166,7 @@ export class RenderKitService implements FUNMAutoRenderDelegate, FUNMFPSDelegate
     const camera = FUNMRenderKit.sharedInstance().camera;
     if (camera) {
       const isFrontCamera = !camera.isFrontCamera;
-      FUNMRenderKit.sharedInstance().autoRenderConfig.isFrontCamera = isFrontCamera;
-      await FUNMRenderKit.stopAutoRender();
-      await FUNMRenderKit.startAutoRender();
-      FUNMAIKit.shareKit().isFrontCamera = isFrontCamera;
+      await FUNMRenderKit.switchCamera(isFrontCamera);
     }
   }
 

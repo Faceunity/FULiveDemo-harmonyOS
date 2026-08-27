@@ -45,6 +45,15 @@
     "performanceLevel": 1
   },
   {
+    "name": "小头",
+    "imeName": "xiaotou",
+    "type": 27,
+    "currentValue": 0.0,
+    "defaultValue": 0.0,
+    "defaultValueInMiddle": false,
+    "performanceLevel": -1
+  },
+  {
     "name": "瘦颧骨",
     "imeName": "shouquangu",
     "type": 5,
@@ -117,6 +126,15 @@
     "performanceLevel": -1
   },
   {
+    "name": "鼻翼",
+    "imeName": "biyi",
+    "type": 30,
+    "currentValue": 0.5,
+    "defaultValue": 0.5,
+    "defaultValueInMiddle": true,
+    "performanceLevel": -1
+  },
+  {
     "name": "嘴型",
     "imeName": "zuixing",
     "type": 12,
@@ -151,6 +169,15 @@
     "defaultValue": 0.0,
     "defaultValueInMiddle": false,
     "performanceLevel": 1
+  },
+  {
+    "name": "外眼角",
+    "imeName": "waiyanjiao",
+    "type": 28,
+    "currentValue": 0.5,
+    "defaultValue": 0.5,
+    "defaultValueInMiddle": true,
+    "performanceLevel": -1
   },
   {
     "name": "眼睑下至",
